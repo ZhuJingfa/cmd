@@ -15,7 +15,7 @@ type LangTmpl struct {
 }
 
 var (
-	mapper    = &core.SnakeMapper{}
+	mapper    = &core.SameMapper{}
 	langTmpls = map[string]LangTmpl{
 		"go":   GoLangTmpl,
 		"c++":  CPlusTmpl,
