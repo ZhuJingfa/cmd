@@ -13,7 +13,7 @@ import (
 
 var (
 	GoLangTmpl LangTmpl = LangTmpl{
-		template.FuncMap{"Mapper": mapper.Table2Obj,
+		template.FuncMap{"Mapper": titleCasedName,
 			"Type":    typestring,
 			"Tag":     tag,
 			"UnTitle": unTitle,
@@ -60,6 +60,30 @@ func basicKind(v reflect.Value) (kind, error) {
 		return stringKind, nil
 	}
 	return invalidKind, errBadComparisonType
+}
+
+func titleCasedName(name string) string {
+	newstr := make([]rune, 0)
+	upNextChar := true
+
+	name = strings.ToLower(name)
+
+	for _, chr := range name {
+		switch {
+		case upNextChar:
+			upNextChar = false
+			if 'a' <= chr && chr <= 'z' {
+				chr -= ('a' - 'A')
+			}
+		case chr == '_':
+			upNextChar = true
+			continue
+		}
+
+		newstr = append(newstr, chr)
+	}
+
+	return string(newstr)
 }
 
 // eq evaluates the comparison a == b || a == c || ...

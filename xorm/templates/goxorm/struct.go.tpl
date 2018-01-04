@@ -10,7 +10,7 @@ import (
 {{range .Tables}}
 type {{Mapper .Name}} struct {
 {{$table := .}}
-{{range .ColumnsSeq}}{{$col := $table.GetColumn .}}	{{Mapper $col.Name}}	{{Type $col}} {{Tag $table $col}}
+{{range .ColumnsSeq}}{{$col := $table.GetColumn .}}	{{$col.Name}}	{{Type $col}} {{Tag $table $col}}
 {{end}}
 }
 
