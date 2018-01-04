@@ -14,4 +14,8 @@ type {{Mapper .Name}} struct {
 {{end}}
 }
 
+func (t {{Mapper .Name}}) TableName() string {
+  return "{{.Name}}"
+}
+
 {{end}}

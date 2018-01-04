@@ -266,7 +266,7 @@ func runReverse(cmd *Command, args []string) {
 				tbs := []*core.Table{table}
 				imports := langTmpl.GenImports(tbs)
 
-				w, err := os.Create(path.Join(genDir, unTitle(mapper.Table2Obj(table.Name))+ext))
+				w, err := os.Create(path.Join(genDir, table.Name)+ext)
 				if err != nil {
 					log.Errorf("%v", err)
 					return err
