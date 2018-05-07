@@ -17,7 +17,7 @@ or you can download from [gobuild](http://gobuild.io/download/github.com/lunny/g
 
 ## Source Install
 
-`go get github.com/go-xorm/cmd/xorm`
+`go get -v github.com/zhujingfa/cmd/xorm`
 
 and you should install the depends below:
 
