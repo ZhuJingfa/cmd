@@ -12,8 +12,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/go-xorm/core"
-	"github.com/go-xorm/xorm"
+	"github.com/zhujingfa/core"
+	"github.com/zhujingfa/xorm"
 	"github.com/go-xweb/log"
 
 	_ "github.com/go-sql-driver/mysql"

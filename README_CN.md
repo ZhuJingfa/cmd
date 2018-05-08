@@ -1,5 +1,5 @@
 
-[English](https://github.com/go-xorm/cmd/blob/master/README.md)
+[English](https://github.com/zhujingfa/cmd/blob/master/README.md)
 
 # xorm 工具
 
@@ -17,11 +17,11 @@ got go-xorm/cmd/xorm
 
 ## 源码安装
 
-`go get github.com/go-xorm/cmd/xorm`
+`go get github.com/zhujingfa/cmd/xorm`
 
 同时你需要安装如下依赖:
 
-* github.com/go-xorm/xorm
+* github.com/zhujingfa/xorm
 
 * Mysql: [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
 
@@ -53,7 +53,7 @@ to get help
 
 example:
 
-`cd $GOPATH/github.com/go-xorm/cmd/xorm`
+`cd $GOPATH/github.com/zhujingfa/cmd/xorm`
 
 sqlite:
 `xorm reverse sqite3 test.db templates/goxorm`
