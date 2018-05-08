@@ -1,5 +1,5 @@
 
-[中文](https://github.com/zhujingfa/cmd/blob/master/README_CN.md)
+[中文](https://github.com/go-xorm/cmd/blob/master/README_CN.md)
 
 # xorm tools
 
@@ -17,11 +17,11 @@ or you can download from [gobuild](http://gobuild.io/download/github.com/lunny/g
 
 ## Source Install
 
-`go get github.com/zhujingfa/cmd/xorm`
+`go get -v github.com/zhujingfa/cmd/xorm`
 
 and you should install the depends below:
 
-* github.com/zhujingfa/xorm
+* github.com/go-xorm/xorm
 
 * Mysql: [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
 
@@ -53,7 +53,7 @@ to get help
 
 example:
 
-`cd $GOPATH/github.com/zhujingfa/cmd/xorm`
+`cd $GOPATH/github.com/go-xorm/cmd/xorm`
 
 sqlite:
 `xorm reverse sqite3 test.db templates/goxorm`
