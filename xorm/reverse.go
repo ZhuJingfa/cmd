@@ -184,7 +184,9 @@ func runReverse(cmd *Command, args []string) {
 			return nil
 		}
 
-		if info.Name() == "protobuf.proto.tpl" {
+		//proto文件命名机制是，文件名.proto.tpl=>文件名.proto，单文件生成
+		protoExtTpl := ".proto.tpl"
+		if strings.LastIndex(info.Name(), protoExtTpl) == len(info.Name())-len(protoExtTpl) {
 			return geneSingleFile(tables, lang, prefix, f, genDir, model, info, false)
 		}
 

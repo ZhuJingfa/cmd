@@ -3,7 +3,7 @@
 
 # xorm 工具
 
-xorm 是一组数据库操作命令行工具。 
+xorm 是一组数据库操作命令行工具。 reverse proto文件命名机制是，文件名.proto.tpl=>文件名.proto，单文件生成
 
 ## 二进制安装
 
