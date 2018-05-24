@@ -19,6 +19,8 @@ var (
 			"UnTitle": unTitle,
 			"gt":      gt,
 			"getCol":  getCol,
+			"fetchProtoIter": fetchProtoIter,
+			"fetchProtoType": fetchProtoType,
 		},
 		formatGo,
 		genGoImports,
@@ -43,6 +45,34 @@ const (
 	stringKind
 	uintKind
 )
+
+//在普通数据索引上+1
+func fetchProtoIter(iter int) int {
+	return iter + 1
+}
+
+//获取protobuf对应的类型
+func fetchProtoType(col *core.Column) string {
+	goType := typestring(col)
+	switch goType {
+	case "time.Time":
+		return "string"
+	case "int", "int64":
+		return "int64"
+	case "float32":
+		return "float"
+	case "float64":
+		return "double"
+	case "[]byte":
+		return "bytes"
+	case "int32":
+		return "int32"
+		//string int64 int32 bool uint32 uint64等相同
+	default:
+		return goType
+	}
+
+}
 
 func basicKind(v reflect.Value) (kind, error) {
 	switch v.Kind() {
