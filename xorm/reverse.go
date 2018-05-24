@@ -130,8 +130,6 @@ func runReverse(cmd *Command, args []string) {
 		return
 	}
 
-	var langTmpl LangTmpl
-	var ok bool
 	var lang string = "go"
 	var prefix string = "" //[SWH|+]
 
@@ -151,11 +149,6 @@ func runReverse(cmd *Command, args []string) {
 		if j, ok := configs["prefix"]; ok {
 			prefix = j
 		}
-	}
-
-	if langTmpl, ok = langTmpls[lang]; !ok {
-		fmt.Println("Unsupported programing language", lang)
-		return
 	}
 
 	os.MkdirAll(genDir, os.ModePerm)
@@ -191,118 +184,161 @@ func runReverse(cmd *Command, args []string) {
 			return nil
 		}
 
-		bs, err := ioutil.ReadFile(f)
-		if err != nil {
-			log.Errorf("%v", err)
-			return err
-		}
-
-		t := template.New(f)
-		t.Funcs(langTmpl.Funcs)
-
-		tmpl, err := t.Parse(string(bs))
-		if err != nil {
-			log.Errorf("%v", err)
-			return err
-		}
-
-		var w *os.File
-		fileName := info.Name()
-		newFileName := fileName[:len(fileName)-4]
-		ext := path.Ext(newFileName)
-
-		if !isMultiFile {
-			w, err = os.Create(path.Join(genDir, newFileName))
-			if err != nil {
-				log.Errorf("%v", err)
-				return err
-			}
-
-			imports := langTmpl.GenImports(tables)
-
-			tbls := make([]*core.Table, 0)
-			for _, table := range tables {
-				//[SWH|+]
-				if prefix != "" {
-					table.Name = strings.TrimPrefix(table.Name, prefix)
-				}
-				tbls = append(tbls, table)
-			}
-
-			newbytes := bytes.NewBufferString("")
-
-			t := &Tmpl{Tables: tbls, Imports: imports, Model: model}
-			err = tmpl.Execute(newbytes, t)
-			if err != nil {
-				log.Errorf("%v", err)
-				return err
-			}
-
-			tplcontent, err := ioutil.ReadAll(newbytes)
-			if err != nil {
-				log.Errorf("%v", err)
-				return err
-			}
-			var source string
-			if langTmpl.Formater != nil {
-				source, err = langTmpl.Formater(string(tplcontent))
-				if err != nil {
-					log.Errorf("%v", err)
-					return err
-				}
-			} else {
-				source = string(tplcontent)
-			}
-
-			w.WriteString(source)
-			w.Close()
+		if isMultiFile {
+			return geneMultiplleFile(tables, lang, prefix, f, genDir, model, info)
 		} else {
-			for _, table := range tables {
-				//[SWH|+]
-				if prefix != "" {
-					table.Name = strings.TrimPrefix(table.Name, prefix)
-				}
-				// imports
-				tbs := []*core.Table{table}
-				imports := langTmpl.GenImports(tbs)
-
-				w, err := os.Create(path.Join(genDir, table.Name)+ext)
-				if err != nil {
-					log.Errorf("%v", err)
-					return err
-				}
-
-				newbytes := bytes.NewBufferString("")
-
-				t := &Tmpl{Tables: tbs, Imports: imports, Model: model}
-				err = tmpl.Execute(newbytes, t)
-				if err != nil {
-					log.Errorf("%v", err)
-					return err
-				}
-
-				tplcontent, err := ioutil.ReadAll(newbytes)
-				if err != nil {
-					log.Errorf("%v", err)
-					return err
-				}
-				var source string
-				if langTmpl.Formater != nil {
-					source, err = langTmpl.Formater(string(tplcontent))
-					if err != nil {
-						log.Errorf("%v-%v", err, string(tplcontent))
-						return err
-					}
-				} else {
-					source = string(tplcontent)
-				}
-
-				w.WriteString(source)
-				w.Close()
-			}
+			return geneSingleFile(tables, lang, prefix, f, genDir, model, info)
 		}
 
 		return nil
 	})
+}
 
+func geneMultiplleFile(tables []*core.Table, lang string, prefix string, f string, genDir string, model string, info os.FileInfo) error {
+	var langTmpl LangTmpl
+	var ok bool
+
+	if langTmpl, ok = langTmpls[lang]; !ok {
+		fmt.Println("Unsupported programing language", lang)
+		return nil
+	}
+
+	t := template.New(f)
+	t.Funcs(langTmpl.Funcs)
+
+	bs, err := ioutil.ReadFile(f)
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	tmpl, err := t.Parse(string(bs))
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	fileName := info.Name()
+	newFileName := fileName[:len(fileName)-4]
+	ext := path.Ext(newFileName)
+
+	for _, table := range tables {
+		//[SWH|+]
+		if prefix != "" {
+			table.Name = strings.TrimPrefix(table.Name, prefix)
+		}
+		// imports
+		tbs := []*core.Table{table}
+		imports := langTmpl.GenImports(tbs)
+
+		w, err := os.Create(path.Join(genDir, table.Name) + ext)
+		if err != nil {
+			log.Errorf("%v", err)
+			return err
+		}
+
+		newbytes := bytes.NewBufferString("")
+
+		tNew := &Tmpl{Tables: tbs, Imports: imports, Model: model}
+
+		err = tmpl.Execute(newbytes, tNew)
+		if err != nil {
+			log.Errorf("%v", err)
+			return err
+		}
+
+		tplcontent, err := ioutil.ReadAll(newbytes)
+		if err != nil {
+			log.Errorf("%v", err)
+			return err
+		}
+		var source string
+		if langTmpl.Formater != nil {
+			source, err = langTmpl.Formater(string(tplcontent))
+
+		} else {
+			source = string(tplcontent)
+		}
+
+		w.WriteString(source)
+		w.Close()
+	}
+
+	return nil
+}
+
+func geneSingleFile(tables []*core.Table, lang string, prefix string, f string, genDir string, model string, info os.FileInfo) error {
+	var langTmpl LangTmpl
+	var ok bool
+
+	if langTmpl, ok = langTmpls[lang]; !ok {
+		fmt.Println("Unsupported programing language", lang)
+		return nil
+	}
+
+	t := template.New(f)
+	t.Funcs(langTmpl.Funcs)
+
+	bs, err := ioutil.ReadFile(f)
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	tmpl, err := t.Parse(string(bs))
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	var w *os.File
+	fileName := info.Name()
+	newFileName := fileName[:len(fileName)-4]
+
+	w, err = os.Create(path.Join(genDir, newFileName))
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	imports := langTmpl.GenImports(tables)
+
+	tbls := make([]*core.Table, 0)
+	for _, table := range tables {
+		//[SWH|+]
+		if prefix != "" {
+			table.Name = strings.TrimPrefix(table.Name, prefix)
+		}
+		tbls = append(tbls, table)
+	}
+
+	newbytes := bytes.NewBufferString("")
+
+	tNew := &Tmpl{Tables: tbls, Imports: imports, Model: model}
+	err = tmpl.Execute(newbytes, tNew)
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	tplcontent, err := ioutil.ReadAll(newbytes)
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+	var source string
+	if langTmpl.Formater != nil {
+		source, err = langTmpl.Formater(string(tplcontent))
+		if err != nil {
+			log.Errorf("%v", err)
+			return err
+		}
+	} else {
+		source = string(tplcontent)
+	}
+
+	w.WriteString(source)
+	w.Close()
+
+	return nil
 }

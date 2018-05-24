@@ -13,7 +13,8 @@ import (
 
 var (
 	GoLangTmpl LangTmpl = LangTmpl{
-		template.FuncMap{"Mapper": titleCasedName,
+		template.FuncMap{
+			"Mapper":         titleCasedName,
 			"Type":    typestring,
 			"Tag":     tag,
 			"UnTitle": unTitle,
