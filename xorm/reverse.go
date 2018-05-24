@@ -184,10 +184,14 @@ func runReverse(cmd *Command, args []string) {
 			return nil
 		}
 
+		if info.Name() == "protobuf.proto.tpl" {
+			return geneSingleFile(tables, lang, prefix, f, genDir, model, info, false)
+		}
+
 		if isMultiFile {
 			return geneMultiplleFile(tables, lang, prefix, f, genDir, model, info)
 		} else {
-			return geneSingleFile(tables, lang, prefix, f, genDir, model, info)
+			return geneSingleFile(tables, lang, prefix, f, genDir, model, info, true)
 		}
 
 		return nil
@@ -267,7 +271,7 @@ func geneMultiplleFile(tables []*core.Table, lang string, prefix string, f strin
 	return nil
 }
 
-func geneSingleFile(tables []*core.Table, lang string, prefix string, f string, genDir string, model string, info os.FileInfo) error {
+func geneSingleFile(tables []*core.Table, lang string, prefix string, f string, genDir string, model string, info os.FileInfo, isFormat bool) error {
 	var langTmpl LangTmpl
 	var ok bool
 
@@ -327,7 +331,8 @@ func geneSingleFile(tables []*core.Table, lang string, prefix string, f string, 
 		return err
 	}
 	var source string
-	if langTmpl.Formater != nil {
+	//proto 生成不格式化，因为是检测golang的
+	if langTmpl.Formater != nil && isFormat {
 		source, err = langTmpl.Formater(string(tplcontent))
 		if err != nil {
 			log.Errorf("%v", err)
