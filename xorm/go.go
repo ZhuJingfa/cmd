@@ -15,13 +15,14 @@ var (
 	GoLangTmpl LangTmpl = LangTmpl{
 		template.FuncMap{
 			"Mapper":         titleCasedName,
-			"Type":    typestring,
-			"Tag":     tag,
-			"UnTitle": unTitle,
-			"gt":      gt,
-			"getCol":  getCol,
+			"Type":           typestring,
+			"Tag":            tag,
+			"UnTitle":        unTitle,
+			"gt":             gt,
+			"getCol":         getCol,
 			"fetchProtoIter": fetchProtoIter,
 			"fetchProtoType": fetchProtoType,
+			"newLine":        newLine,
 		},
 		formatGo,
 		genGoImports,
@@ -46,6 +47,10 @@ const (
 	stringKind
 	uintKind
 )
+
+func newLine() string {
+	return "\n"
+}
 
 //在普通数据索引上+1
 func fetchProtoIter(iter int) int {
